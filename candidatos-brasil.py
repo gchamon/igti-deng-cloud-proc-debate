@@ -6,12 +6,9 @@
 from spark.sql.session import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
-
+bucket_name = "gchamon-igti-deng-cloud-proc-datalake"
 
 # In[8]:
-
-
-from spark.sql import functions as f
 
 import pandas as pd
 
@@ -28,7 +25,7 @@ latin_1 = "ISO-8859-1"
 cassacao = (
     spark
     .read
-    .csv("gs://gchamon-igti-deng-cloud-proc-datalake/raw/motivo_cassacao_2020_BRASIL.csv",
+    .csv(f"gs://{bucket_name}/raw/motivo_cassacao_2020_BRASIL.csv",
          sep=";",
          encoding=latin_1,
          escape="\"",
@@ -48,7 +45,7 @@ cassacao.limit(1).toPandas()
 candidatos = (
     spark
     .read
-    .csv("gs://gchamon-igti-deng-cloud-proc-datalake/raw/consulta_cand_2020_BRASIL.csv",
+    .csv(f"gs://{bucket_name}/raw/consulta_cand_2020_BRASIL.csv",
          sep=";",
          encoding=latin_1,
          escape="\"",
@@ -65,10 +62,10 @@ candidatos.limit(1).toPandas()
 # In[10]:
 
 
-bens_candidatos = (candidatos
+bens_candidatos = (
     spark
     .read
-    .csv("gs://gchamon-igti-deng-cloud-proc-datalake/raw/bem_candidato_2020_BRASIL.csv",
+    .csv(f"gs://{bucket_name}/raw/bem_candidato_2020_BRASIL.csv",
          sep=";",
          encoding=latin_1,
          escape="\"",
@@ -85,9 +82,9 @@ bens_candidatos.limit(1).toPandas()
 # In[12]:
 
 
-cassacao.write.mode("overwrite").parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/cassacao")
-candidatos.write.mode("overwrite").parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/candidatos")
-bens_candidatos.write.mode("overwrite").parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/bens_candidatos")
+cassacao.write.mode("overwrite").parquet(f"gs://{bucket_name}/staging/cassacao")
+candidatos.write.mode("overwrite").parquet(f"gs://{bucket_name}/staging/candidatos")
+bens_candidatos.write.mode("overwrite").parquet(f"gs://{bucket_name}/staging/bens_candidatos")
 
 
 # In[14]:
@@ -96,17 +93,17 @@ bens_candidatos.write.mode("overwrite").parquet("gs://gchamon-igti-deng-cloud-pr
 candidatos = (
     spark
     .read
-    .parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/candidatos")
+    .parquet(f"gs://{bucket_name}/staging/candidatos")
 )
 bens_candidatos = (
     spark
     .read
-    .parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/bens_candidatos")
+    .parquet(f"gs://{bucket_name}/staging/bens_candidatos")
 )
 cassacao = (
     spark
     .read
-    .parquet("gs://gchamon-igti-deng-cloud-proc-datalake/staging/cassacao")
+    .parquet(f"gs://{bucket_name}/staging/cassacao")
 )
 
 
@@ -144,7 +141,7 @@ candidatos_bens_cassacao.limit(5).toPandas()
     .write
     .mode("overwrite")
     .partitionBy("SG_UF")
-    .parquet("gs://gchamon-igti-deng-cloud-proc-datalake/curated/candidatos_bens_cassacao")
+    .parquet(f"gs://{bucket_name}/curated/candidatos_bens_cassacao")
 )
 
 
@@ -156,6 +153,6 @@ candidatos_bens_cassacao.limit(5).toPandas()
     .write
     .mode("overwrite")
     .partitionBy("SG_UF")
-    .csv("gs://gchamon-igti-deng-cloud-proc-datalake/human_readable/candidatos_bens_cassacao")
+    .csv(f"gs://{bucket_name}/human_readable/candidatos_bens_cassacao")
 )
 
