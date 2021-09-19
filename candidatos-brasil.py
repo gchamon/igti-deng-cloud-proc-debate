@@ -3,8 +3,9 @@
 
 # In[1]:
 
+from spark.sql.session import SparkSession
 
-spark
+spark = SparkSession.builder.getOrCreate()
 
 
 # In[8]:
